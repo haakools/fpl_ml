@@ -66,7 +66,7 @@ class MCTS:
             node = self._uct_select(node)
 
     def _expand(self, node):
-        """Updatre the `children` dict with the children of `node`"""
+        """Update the `children` dict with the children of `node`"""
         if node in self.children:
             return # already expanded
         self.children[node] = node.find_children()

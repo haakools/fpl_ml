@@ -5,7 +5,6 @@ from typing import List
 from utils import load_csv
 import player
 
-
 class Position(enum.Enum):
     """double check what the values are inside the dataset"""
     GK = 1
@@ -110,22 +109,15 @@ class Team:
         else:
             total_points += self.vice_captain.player_points() 
 
+        # This requires the self.bench list to be correctly ordered as wished
+        subs = [player for player in self.bench if player.minutes != 0]
+
+
+
+
         for player in self.starting:
-            if player.is_captain():
-                if player.p_data.minutes != 0:
-                    total_points += 2 * player.player_points()
-            else:
-                total_points += player.player_points()
+               total_points += player.player_points()
         return total_points
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":

@@ -3,8 +3,8 @@ import pandas as pd
 
 class Player:
     """Snapshot of a player at a given gameweek 
-    Baseclass storing the player's name, position, cost and points"""
-    def __init__(self, p_data, gamweek: int, is_captain: bool = False, is_vice_captain: bool = False):
+    Baseclass storing the player's name, position, cost/price and points"""
+    def __init__(self, p_data, gameweek: int, is_captain: bool = False, is_vice_captain: bool = False):
         """Player is set from a pandas dataset series with data.
         Args:
             p_data (pandas dataset series)
@@ -17,14 +17,14 @@ class Player:
         self.__set_constant_metadata()
         self.is_captain = is_captain
         self.is_vice_captain = is_vice_captain
-        self.gameweek = gamweek
+        self.gameweek = gameweek
 
     def __set_constant_metadata(self):
         """private function to set the constant metadata of the player"""
         self.id             = self.p_data.id
         self.player_name    = self.p_data.name
         self.position       = self.p_data.position
-        self.cost           = self.p_data.cost
+        self.price           = self.p_data.cost
         self.team           = self.p_data.team
 
     def update_gameweek_data(self, df: pd.Series, gameweek:int):
@@ -41,5 +41,5 @@ class Player:
         print(f"Name: \t{self.player_name}")
         print(f"Team: \t{self.team}")
         print(f"Pos: \t{self.position}")
-        print(f"Cost: \t{self.cost}")
+        print(f"Cost: \t{self.price}")
         print(f"Points: {self.round_points}")

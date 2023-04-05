@@ -34,7 +34,7 @@ class MCTS:
 
         def score(n):
             """Calculate the UCB score for a node"""
-            if self.N[n] == 0
+            if self.N[n] == 0:
                 return float("-inf") # avoid unseen moves
             # average reward of the node. (reward of the node / number of visits of the node) 
             return self.Q[n] / self.N[n] 

@@ -1,7 +1,6 @@
 import enum
 from typing import List
 
-
 from utils import load_csv
 import player
 
@@ -29,47 +28,40 @@ class Team:
         self.defenders = defenders
         self.midfielders = midfielders
         self.forwards = forwards
-
         self.budget = None
         self.transfers_available = None # :int, maximum 2. Always 1
 
+        # Team composition set at the start of the gameweek
         self.captain = None # player.Player
         self.vice_captain = None # player.Player
         self.starting = None # list of 11 players. composition of players needs to be correct!
         self.bench = None # list of 4 players, ORDER MATTERS
 
+        # Rules counters. 
+        self.team_counter = None # Make sure not more than 3 players from the same team
+        self.position_counter = None # make sure the 2 GK, 5 DEF, 5 MID, 3 FWD are correct
+        # Formation must be atleast 1 GK, 3DEF and 1 FWD.
 
+    def team_summary(self):
+        """Prints out the team summary"""
+        print("Team Summary")
+        print(f"Gameweek: {self.gameweek}")
+        for p in self.goalkeepers:
+            p.player_summary()
+        for p in self.defenders:
+            p.player_summary()
+        for p in self.midfielders:
+            p.player_summary()
+        for p in self.forwards:
+            p.player_summary()
 
-    def set_starting(self, starting):
-        """Set the starting team"""
-        # Always needs to be a goalkeeper
-
-
-        self.verify_starting(starting)
-        self.starting = starting    
-
-    def verify_position(self, position: Position, players: List[player.Player]) -> bool:
-        """Verify the position is valid"""
-        for player in players:
-            if player.position != position:
-                raise ValueError(f"Player {player.player_name} is not a {position}")
-
-
-    def verify_starting(self, starting) -> bool:
-        """Verify the starting team is valid"""
-        if len(starting) != 11:
-            return False
-
-        if len(starting) != len(set(starting)):
-            return False
-
-        if self.captain not in starting:
-            return False
-
-        if self.budget < 0:
-            return False
-
-        return True
+    def do_random_transfer(self):
+        """
+        Does a random transfer adhering to the rules.
+        Cannot transfer the same player twice within a gameweek.
+        """
+        
+        pass
 
     def set_captain(self, captain): 
         """Only setting the captain to a player in the starting team"""
@@ -82,7 +74,6 @@ class Team:
 
         self.starting.remove(sell_player)
         self.starting.append(buy_player)
-
 
     def play_out_gameweek(self, gameweek: int):
         """
@@ -112,21 +103,10 @@ class Team:
         # This requires the self.bench list to be correctly ordered as wished
         subs = [player for player in self.bench if player.minutes != 0]
 
-
-
-
         for player in self.starting:
                total_points += player.player_points()
         return total_points
 
 
 if __name__ == "__main__":
-    # Load gameweek 1 and all its players
-    gameweek = 1
-    file = f"gameweek/gameweek_{gameweek}.csv"
-    df = load_csv(file)
-    players = [df.iloc[:,i] for i in range(len(df))]
-
-    p1 = player.Player(players[0], gameweek)
-    p1.player_summary()
-
+    pass

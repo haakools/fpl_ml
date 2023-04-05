@@ -13,7 +13,7 @@ class Player:
             is_vice_captain (bool): is the player the vice captain
         """
         self.p_data = p_data
-        self.total_points   = p_data.total_points
+        self.round_points = p_data.total_points
         self.__set_constant_metadata()
         self.is_captain = is_captain
         self.is_vice_captain = is_vice_captain
@@ -33,12 +33,13 @@ class Player:
         self.gameweek = gameweek
         self.__set_constant_metadata()
 
-    def player_points(self):
+    def get_round_points(self):
         """Return the player's points for the gameweek"""
-        return self.p_data.total_points
+        return self.p_data.round_points
 
     def player_summary(self):
         print(f"Name: \t{self.player_name}")
+        print(f"Team: \t{self.team}")
         print(f"Pos: \t{self.position}")
         print(f"Cost: \t{self.cost}")
-        print(f"Points: {self.total_points}")
+        print(f"Points: {self.round_points}")

@@ -1,5 +1,4 @@
 """Functions for loading a list of players"""
-
 import pandas as pd
 import os
 from typing import List
@@ -28,7 +27,11 @@ def load_all_gameweeks_players(gameweek: int) -> List[player.Player]:
     players = []
     for _, row in df.iterrows():
         players.append(player.Player(row, gameweek))
-    return players
+    gk_players = [p for p in players if p.position == "GK"]    
+    def_players = [p for p in players if p.position == "DEF"]
+    mid_players = [p for p in players if p.position == "MID"]
+    fwd_players = [p for p in players if p.position == "FWD"]
+    return gk_players, def_players, mid_players, fwd_players 
 
 def update_player_list(players: List[player.Player], gameweek: int) -> List[player.Player]:
     """Updates the player list to the gameweek given"""
@@ -40,19 +43,18 @@ def update_player_list(players: List[player.Player], gameweek: int) -> List[play
 if __name__ == "__main__":
     # Selecting a player
     gameweek = 1
-    p_selected = load_all_gameweeks_players(gameweek)[5]
+    GK, DEF, MID, FWD = load_all_gameweeks_players(gameweek)[5]
 
-    print(f"Gameweek: {p_selected.gameweek}")
-    print(f"Selected player: {p_selected.player_name}")
-    print(f"Selected player data: {p_selected.p_data}")
-    p_selected.player_summary()
+    print(f"Gameweek: {GK.gameweek}")
+    print(f"Selected player: {GK.player_name}")
+    print(f"Selected player data: {GK.p_data}")
+    GK.player_summary()
 
     # Updating the gameweek
     gameweek = 20
-    p_selected = update_player_list([p_selected], gameweek)[0]
+    GK = update_player_list(GK, gameweek)[0]
 
-    print(f"Gameweek: {p_selected.gameweek}")
-    print(f"Selected player: {p_selected.player_name}")
-    print(f"Selected player data: {p_selected.p_data}")
-    p_selected.player_summary()
-
+    print(f"Gameweek: {GK.gameweek}")
+    print(f"Selected player: {GK.player_name}")
+    print(f"Selected player data: {GK.p_data}")
+    GK.player_summary()

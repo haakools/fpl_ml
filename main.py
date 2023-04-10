@@ -26,7 +26,6 @@ def create_first_team(
     mid_list = []
     fwd_list = []
 
-
 class TransferManager:
     """Class to conduct transfers and keep at 
     each node of unique combinations"""
@@ -36,30 +35,46 @@ class TransferManager:
         self.gameweek_players = gameweek_dict[gameweek] # all the players to choose from
         self.exhausted_transfers = []
 
-    def execute_random_transfer(self, team: Team):
-        """Does a random transfer given a team"""
-        team_budget = team.budget
-
-        # Sell a random player
-        outgoing_player = random.choice(team.team_list) 
-        # TODO: Evenutally this "random-choice" will be replaced by expected points model.
-        team_budget += outgoing_player.price
-        team.team_list.remove(outgoing_player)
-
-        # Buy a random player
-        allowed_clubs = team.get_allowed_clubs_for_transfer()
+    def query_legal_players(self, 
+                            allowed_clubs: list,
+                            team_budget: int,
+                            outgoing_player: Player):
+        """Returns a list of legal players to transfer to"""
+        # This could be a function
         incoming_player = Player(
             self.gameweek_players[
                 (self.gameweek_players["team"].isin(allowed_clubs)) &
                 (self.gameweek_players["cost"] <= team_budget) &
                 (self.gameweek_players["position"] == outgoing_player.position)
-            ].sample(n=1),
+            ].sample(n=1).squeeze(), # squeeze to convert to series
             self.gameweek,
         )
+        return incoming_player
 
-        team_budget -= incoming_player.cost
+    def execute_random_transfer(self, team: Team):
+        """Does a random transfer given a team"""
+        team_budget = team.budget
+
+        # TODO: make this support multiple transfers, based on the number of transfers available
+        # TODO: Make the selling and buying of players be not 
+        # 100% random but driver by expected points model
+
+        # Sell a random player
+        outgoing_player = random.choice(team.team_list) 
+        team_budget += outgoing_player.price
+        team.team_list.remove(outgoing_player)
+
+        # Buy a random player
+        allowed_clubs = team.get_allowed_clubs_for_transfer()
+        incoming_player = self.query_legal_players(allowed_clubs, team_budget, outgoing_player)
+        team_budget -= incoming_player.price
         team.team_list.append(incoming_player)
-        print(f"Transferred {outgoing_player.name} to {incoming_player.name}")
+
+        # Debugging summary
+        print("Outgoing:\n:")
+        outgoing_player.player_summary()
+        print("Incoming:\n:")
+        incoming_player.player_summary()
         return team
 
 
@@ -72,6 +87,7 @@ def main():
     # No more than 3 players from the same team
     # Cost cannot exceed 1000    
 
+    # Dummy team
     team_list = [
         gk_players[0],gk_players[10],
         def_players[0], def_players[15], def_players[20], def_players[30], def_players[40],
@@ -86,10 +102,10 @@ def main():
         transfers_available=1,
         )
     transfer_manager = TransferManager(start_gw)
-    start_team.team_summary()
 
-    transfer_manager.execute_random_transfer(start_team)
-    start_team.team_summary()
+    for gameweek in range(start_gw+1, 27):
+        print(f"Gameweek {gameweek}")
+        transfer_manager.execute_random_transfer(start_team)
 
 
 if __name__ == "__main__":

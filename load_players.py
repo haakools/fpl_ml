@@ -12,6 +12,7 @@ gameweek_dict = {
     for gameweek_counter in range(1, len(os.listdir("gameweek")) + 1)
 }
 
+
 def load_all_gameweeks_players(gameweek: int) -> List[player.Player]:
     """Load the all players from the csv file for a given gameweek
 

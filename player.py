@@ -27,6 +27,9 @@ class Player:
         self.price           = self.p_data.cost
         self.team           = self.p_data.team
 
+        # TODO: add more metadata
+        self.threat        = self.p_data.threat
+
     def update_gameweek_data(self, df: pd.Series, gameweek:int):
         """Update the player's gameweek data"""
         self.p_data = df

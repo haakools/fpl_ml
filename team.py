@@ -78,14 +78,19 @@ class Team:
             self.starting,
             self.bench)
 
-    def set_captain(self, captain): 
-        """Only setting the captain to a player in the starting team"""
-        self.captain = captain if captain in self.starting else None
+    def set_starting(self):
+        """Set the starting team.
+        Selecting the bench as the "worst" players in the team, and the rest
+        is starting"""
+        self.bench = sorted(self.team_list, key=lambda x: x.threat(), reverse=True)[11:]
+        self.starting = [player for player in self.team_list if player not in self.bench]
 
-    def change_player(self, sell_player: List[player.Player], buy_player: List[player.Player]):
-        """Change a player in the starting team"""
-        self.starting.remove(sell_player)
-        self.starting.append(buy_player)
+    def set_captain_and_vice_captain(self): 
+        """Only setting the captain to a player in the starting team"""
+        threat_rating = [player.threat() for player in self.starting]
+        self.captain = self.starting[threat_rating.index(max(threat_rating))]
+        threat_rating.remove(max(threat_rating))
+        self.vice_captain = self.starting[threat_rating.index(max(threat_rating))]
 
     def play_out_gameweek(self, gameweek: int):
         """
@@ -105,19 +110,19 @@ class Team:
             - bench changes
             - no changes 
         """
-        total_points = 0
+        round_points = 0
     
         if self.captain.minutes != 0:
-            total_points += 2 * self.captain.player_points()
+            round_points += 2 * self.captain.player_points()
         else:
-            total_points += self.vice_captain.player_points() 
+            round_points += self.vice_captain.player_points() 
 
         # This requires the self.bench list to be correctly ordered as wished
         subs = [player for player in self.bench if player.minutes != 0]
 
         for player in self.starting:
-               total_points += player.player_points()
-        return total_points
+                round_points += player.player_points()
+        return round_points
 
 if __name__ == "__main__":
     pass

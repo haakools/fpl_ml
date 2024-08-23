@@ -12,50 +12,64 @@ Could also be flipped, so that the players are the rows and the gameweeks are th
 """
 import requests
 import pandas as pd
+import os
 
 
-# PLAYER ID MAPPING
+MAX_GAMEWEEKS = 38
+YEAR = 2024
 
-# Creating player map
-def get_player_map(elements_df):
-    player_map = {}
-    for i in range(len(elements_df)):
-        # Creating the index mappings from the LAST gameweek
-        index = elements_df['id'].iloc[i]
-        first_name = elements_df['first_name'].iloc[i]
-        second_name = elements_df['second_name'].iloc[i]
+class FantasyPremierLeagueAPI:
+    def __init__(self):
+        pass
 
-        player_map[str(index)] = first_name + " " + second_name
+    def get_player_map(self):
+        url = "https://fantasy.premierleague.com/api/bootstrap-static/"
+        r = requests.get(url)
+        content = r.json()
 
-    return player_map
+        elements_df = pd.DataFrame(content["elements"])
+        elements_types_df = pd.DataFrame(content["element_types"])
+        teams_df = pd.DataFrame(content["teams"])
 
-url = "https://fantasy.premierleague.com/api/bootstrap-static/"
-r = requests.get(url)
-json = r.json()
-for k in json.keys():
-    print(k)
+        # PLAYER ID MAPPING
+        player_map = {}
+        for i in range(len(elements_df)):
+            index = elements_df['id'].iloc[i]
+            first_name = elements_df['first_name'].iloc[i]
+            second_name = elements_df['second_name'].iloc[i]
+            player_map[str(index)] = first_name + " " + second_name
+        self.player_map = player_map
 
-elements_df = pd.DataFrame(json["elements"])
-elements_types_df = pd.DataFrame(json["element_types"])
-teams_df = pd.DataFrame(json["teams"])
-player_map = get_player_map(elements_df)
+    def download_data(self):
+        if not hasattr(self, "player_map" ):
+            self.get_player_map()
 
+        for i in range(1, MAX_GAMEWEEKS):
+            if not self.download_gameweek(i):
+                break
 
-# Get the first gameweek data:
-gameweek_range = range(1,28)
+    def download_gameweek(self, gameweek_number:str) -> bool:
+        gameweek_stats = {}
+        player_stats = {}
+        reply = requests.get(f"https://fantasy.premierleague.com/api/event/{gameweek_number}/live/")
+        players = reply.json()["elements"]
 
-gameweek_stats = {}
-for i in gameweek_range:
-    player_stats = {}
-    url = f"https://fantasy.premierleague.com/api/event/{i}/live/"
-    reply = requests.get(url).json()["elements"]
-    # print(len(reply)) # 573-750 players. players are only removed on new season
-    for player in reply:
-        player_name = player_map[str(player["id"])]
-        #print(player_name)
-        #print(player["stats"])
-        player_stats[player_name] = player["stats"]
-    gameweek_stats[str(i)] = player_stats
-    # converting the dictionaries into a pandas dataframe
-    df = pd.DataFrame(player_stats)
-    df.to_csv(f"gameweek/gameweek_{i}.csv")
+        print(f"Found {len(players)} for gameweek {gameweek_number}")
+        if len(players) == 0:
+            return False
+
+        for player in players:
+            player_name = self.player_map[str(player["id"])]
+            player_stats[player_name] = player["stats"]
+        gameweek_stats[str(gameweek_number)] = player_stats
+
+        # Saving to disk
+        df = pd.DataFrame(player_stats)
+        directory =f"data/season_{YEAR}"
+        os.makedirs(directory, exist_ok=True)
+        df.to_csv(directory+ f"/gameweek_{gameweek_number}.csv")
+        return True
+
+if __name__ == "__main__":
+    client = FantasyPremierLeagueAPI()
+    client.download_data()

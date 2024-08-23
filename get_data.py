@@ -1,15 +1,4 @@
 
-"""
-Want to have the data on the form of a dataframe/csv file with the following structure:
-|            | PLAYER #1 | PLAYER #2 |
-| GAMEWEEK 1 |           |           |
-| GAMEWEEK 2 |           |           |
-| GAMEWEEK 3 |           |           |
-| GAMEWEEK 4 |           |           |
-| GAMEWEEK 5 |           |           |
-| GAMEWEEK 6 |           |           |
-Could also be flipped, so that the players are the rows and the gameweeks are the columns.
-"""
 import requests
 import pandas as pd
 import os

@@ -1,22 +1,26 @@
-
 # Create a tool that creates an optimal strategy for Premier League Fantasy
 
 The goal:
- - Given your team, it should calculate what the optimal strategy for the next N rounds are.
- - Host this on a webpage with some javascript framework
+ - Given your team, either link or team code, it should calculate what the optimal strategy for the next N rounds are to maximize points.
+ - Host this on a webpage with some javascript framework.
 
 
-How to achieve this:
- - Get the python wrapper for fantasy premier league to download some data
- - Create first a $t=0$ strategy based on the most popular team for fantasy after the first gameweek this season (2022/23)
- - https://www.analyticsvidhya.com/blog/2022/09/uninformed-search-strategy-for-state-space-search-solving/ 
+## Setup
 
+Setup submodules
 
-Maybe not MCTS ??? 
-Each depth would be a gameweek, where every node would be a change in 
-transfers, captain, benchplayers.
+```
+git submodule init
+git submodule update --remote --recursive
+```
 
- - Make a monte carlo tree search where each depth is a gameweek.
+Setup virtual env
+
+```
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 
 

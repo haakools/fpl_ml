@@ -1,11 +1,12 @@
 # python
 venv
 __pycache__
-
+*.egg-info
 
 # vscode
 .vscode
 
 # Downloaded data 
 data
+
 

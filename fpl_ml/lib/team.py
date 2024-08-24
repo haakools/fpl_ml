@@ -2,7 +2,7 @@ import enum
 from typing import List
 import random
 
-from player import Player
+from fpl_ml.lib.player import Player
 
 
 

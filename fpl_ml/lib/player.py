@@ -14,9 +14,10 @@ class Player:
         self.id = id
         self.gameweek = gameweek
         self.series = series
-        self.team = self.series["team"].iloc[self.gameweek-1]
-        self.team_code = self.series["team_code"].iloc[self.gameweek-1]
-        self.name = self.series["name"].iloc[self.gameweek-1]
+        self.team: str = self.series["team"].iloc[self.gameweek-1]
+        self.team_code: str = self.series["team_code"].iloc[self.gameweek-1]
+        self.name: str = self.series["name"].iloc[self.gameweek-1]
+        self.position: str = self.series["position"].iloc[self.gameweek-1]
 
     def change_gameweek(self, gameweek: int) -> None:
         self.gameweek = gameweek
@@ -27,6 +28,7 @@ class Player:
             player name {self.name}
             team {self.team}
             team_code {self.team_code}
+            position {self.position}
         """
 
     def to_json(self):

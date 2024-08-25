@@ -21,12 +21,14 @@ class Team:
             players: List[Player],
             budget: int,
             transfers_available: int,
+            season_team_map: dict
             ):
         """Initialise the team with the players and budget for a given gameweek""" 
         self.gameweek = gameweek
         self.players = players
         self.budget = budget
         self.transfers_available = transfers_available
+        self.season_team_map: dict = season_team_map
 
         self.chip_used = None  #
 
@@ -79,30 +81,44 @@ class Team:
             "transfers_out": self.transfers_out
         }
 
-
-    def transfer(self):
-        available_clubs = self.get_available_clubs_for_transfer()
-
-
     def get_available_clubs_for_transfer(self):
-        return
 
-    def get_club_count(self):
-        self.club_count = {}
-        for p in self.players:
-            if p.team in self.club_count:
-                self.club_count[p.team] += 1
-            else:
-                self.club_count[p.team] = 1
-        return self.club_count
+        team_club_counter = {team: 3 for team in self.season_team_map}
+        print(team_club_counter)
+        for player in self.players:
+            team_club_counter[player.team_code] -= 1
+            
+        available_teams = [
+            club for club in team_club_counter
+            if team_club_counter.get("club", 3) < 3
+        ]
+        return available_teams, team_club_counter
 
-    def get_allowed_clubs_for_transfer(self):
-        """Returns a list of clubs that can be transferred to"""
-        allowed_clubs = []
-        for club, count in self.get_club_count().items():
-            if count < 3:
-                allowed_clubs.append(club)
-        return allowed_clubs
+    def get_legal_transfers(self):
+        # Transfer parameters
+        MAX_TRANSFER_PER_GW = 4
+
+        # just keep count when transferring instead...
+        #position_requiements = {"GK": 2, "DEF": 5, "MID": 5, "FWD": 3}
+
+        self.transfers_out: List[Player] = random.choices(
+            self.players, 
+            weights=15*[1/15],
+            k=MAX_TRANSFER_PER_GW
+            )
+        for p in self.transfer_out:
+            print(p)        
+
+        # Get the positions that needs to be filled
+        positions = [p.position for p in self.transfers_out] 
+
+        available_clubs, team_club_counter = self.get_available_clubs_for_transfer(self.transfers_out)
+        self.transfer_out = self.buy_players(positions, available_clubs, self.budget)
+
+    def buy_players(self, positions, available_clubs, budget):
+        pass 
+
+
 
 
 if __name__ == "__main__":

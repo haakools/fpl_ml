@@ -4,10 +4,11 @@ import json
 from lib.team import Team
 from lib.player import Player
 from fpl_ml.fpl_api_handler import FplApiHandler, PersonalTeamInfo
-from gameweek_database import GameweeekDatabase
+from gameweek_database import GameweekDatabase
+from fpl_ml.mcts import MCTS, MCTSNode
 
 
-def populate_team(team_info: PersonalTeamInfo, season: str, database: GameweeekDatabase) -> Team:
+def populate_team(team_info: PersonalTeamInfo, season: str, database: GameweekDatabase) -> Team:
 
 
     player_list = [
@@ -18,11 +19,9 @@ def populate_team(team_info: PersonalTeamInfo, season: str, database: GameweeekD
         team_info.gameweek,
         player_list,
         team_info.budget, 
-        team_info.available_transfers
+        team_info.available_transfers,
+        database.team_code_map[SEASON]
         ) 
-
-
-
 
 
 fpl_api = FplApiHandler()
@@ -30,7 +29,7 @@ fpl_api = FplApiHandler()
 TEAM_ID = "2180411"
 SEASON = "2023-24"
 
-database = GameweeekDatabase()
+database = GameweekDatabase()
 database.load_database(SEASON)
 team_info: PersonalTeamInfo = fpl_api.get_personal_team_info(TEAM_ID)
 
@@ -38,15 +37,13 @@ team_info: PersonalTeamInfo = fpl_api.get_personal_team_info(TEAM_ID)
 # Root Node
 team: Team = populate_team(team_info, SEASON, database=database)
 
-
+print("Selected team:")
 for player in team.players:
     print(player)
-    player.print_json()
-    import sys
-    sys.exit(0)
-# 3. Iterate over different branches
 
 
+mcts = MCTS(team, database, max_depth=1, iterations=2)
+result = mcts.search()
 
-
+print(result)
 

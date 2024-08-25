@@ -21,7 +21,7 @@ import math
 import random
 
 from fpl_ml.lib.team import Team
-from gameweek_database import GameweekDatabase
+from fpl_ml.gameweek_database import GameweekDatabase
 
 
 def hash_objects(object_list: list):

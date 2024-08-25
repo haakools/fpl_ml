@@ -1,6 +1,5 @@
 import argparse
-
-def main(season: str, team_id: int, max_depth, iterations, output_file, verbose):
+import fpl_ml
 
 
 
@@ -25,9 +24,13 @@ if __name__ == "__main__":
     # Access the arguments
     season = args.season
     team_id = args.team_id
-    max_depth = args.max_depth
+    max_depth = args.maxdepth
     iterations = args.iterations
     output_file = args.output_file
     verbose = args.verbose
 
-    main(season, team_id, max_depth, iterations, output_file, verbose)
+    """
+    python3 main.py -s 2024-25 -t 2180411
+    """
+
+    fpl_ml.run_analysis(season, team_id, max_depth, iterations, output_file, verbose)

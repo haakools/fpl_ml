@@ -1,10 +1,12 @@
 import enum
 from typing import List
+import json
 import random
 
 from fpl_ml.lib.player import Player
 
 
+MAX_TRANSFER_PER_GW = 4
 
 class Position(enum.Enum):
     """double check what the values are inside the dataset"""
@@ -62,7 +64,7 @@ class Team:
         }
     
     def __repr__(self) -> str:
-        return self.get_team_info()
+        return json.dumps(self.get_team_info(), indent=4)
 
 
 
@@ -81,13 +83,15 @@ class Team:
             "transfers_out": self.transfers_out
         }
 
-    def get_available_clubs_for_transfer(self):
+    def get_available_clubs_for_transfer(self, transfers_out):
 
         team_club_counter = {team: 3 for team in self.season_team_map}
-        print(team_club_counter)
         for player in self.players:
-            team_club_counter[player.team_code] -= 1
-            
+            if player in transfers_out:
+                team_club_counter[player.team_code] += 1
+            else:
+                team_club_counter[player.team_code] -= 1
+         
         available_teams = [
             club for club in team_club_counter
             if team_club_counter.get("club", 3) < 3
@@ -96,29 +100,39 @@ class Team:
 
     def get_legal_transfers(self):
         # Transfer parameters
-        MAX_TRANSFER_PER_GW = 4
 
         # just keep count when transferring instead...
         #position_requiements = {"GK": 2, "DEF": 5, "MID": 5, "FWD": 3}
 
-        self.transfers_out: List[Player] = random.choices(
+        transfers_out: List[Player] = random.choices(
             self.players, 
             weights=15*[1/15],
             k=MAX_TRANSFER_PER_GW
             )
-        for p in self.transfer_out:
+        
+
+        for p in transfers_out:
             print(p)        
 
         # Get the positions that needs to be filled
-        positions = [p.position for p in self.transfers_out] 
+        positions = [p.position for p in transfers_out] 
 
-        available_clubs, team_club_counter = self.get_available_clubs_for_transfer(self.transfers_out)
-        self.transfer_out = self.buy_players(positions, available_clubs, self.budget)
+        available_clubs, team_club_counter = self.get_available_clubs_for_transfer(transfers_out)
+        transfers_in = self.buy_players(positions, available_clubs, self.budget)
+
+        # TODO: assertions for transfers_out, transfers_in before finalizing
+        # need to ensure the transfers are unique in some sense
 
     def buy_players(self, positions, available_clubs, budget):
-        pass 
-
-
+        # TODO: Make gameweek database generate expected score for all players
+        all_players = []
+        all_players_expected_score = []
+        transfer_in = random.choices(
+            all_players,
+            weights=all_players_expected_score,
+            k=MAX_TRANSFER_PER_GW
+        )
+        return transfers_in
 
 
 if __name__ == "__main__":

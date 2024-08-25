@@ -7,10 +7,11 @@ from fpl_ml.fpl_api_handler import FplApiHandler, PersonalTeamInfo
 from gameweek_database import GameweeekDatabase
 
 
-def populate_team(team_info: PersonalTeamInfo, database: GameweeekDatabase) -> Team:
+def populate_team(team_info: PersonalTeamInfo, season: str, database: GameweeekDatabase) -> Team:
+
 
     player_list = [
-        database.create_player(player_id)
+        Player(player_id, database.get_player_series(player_id, SEASON), team_info.gameweek)
         for player_id in team_info.player_ids()
     ]
     return Team(
@@ -20,19 +21,29 @@ def populate_team(team_info: PersonalTeamInfo, database: GameweeekDatabase) -> T
         team_info.available_transfers
         ) 
 
-database = GameweeekDatabase()
-database.load_database()
+
+
+
 
 fpl_api = FplApiHandler()
 
 TEAM_ID = "2180411"
+SEASON = "2023-24"
+
+database = GameweeekDatabase()
+database.load_database(SEASON)
 team_info: PersonalTeamInfo = fpl_api.get_personal_team_info(TEAM_ID)
 
 
 # Root Node
-team: Team = populate_team(team_info, database=database)
+team: Team = populate_team(team_info, SEASON, database=database)
 
 
+for player in team.players:
+    print(player)
+    player.print_json()
+    import sys
+    sys.exit(0)
 # 3. Iterate over different branches
 
 

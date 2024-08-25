@@ -39,6 +39,10 @@ class MCTSNode:
         self.children = []
         self.visits = 0
         self.value = 0
+    
+    def find_random_child(self):
+
+
 
 class MCTS:
     def __init__(self, exploration_weight=1.4):
@@ -54,9 +58,9 @@ class MCTS:
 
         # find_random_child would need to have some bias and legal moves
 
-        new_state = node.state.find_random_child()
+        new_state = node.find_random_child()
         while new_state in tried_children:
-            new_state = node.state.find_random_child()
+            new_state = node.find_random_child()
         child = MCTSNode(new_state, parent=node)
         node.children.append(child)
         return child

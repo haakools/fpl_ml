@@ -5,7 +5,7 @@ import os
 
 
 MAX_GAMEWEEKS = 38
-YEAR = 2024
+SEASON = "2024-25"
 
 class FantasyPremierLeagueAPI:
     def __init__(self):
@@ -19,15 +19,18 @@ class FantasyPremierLeagueAPI:
         elements_df = pd.DataFrame(content["elements"])
         elements_types_df = pd.DataFrame(content["element_types"])
         teams_df = pd.DataFrame(content["teams"])
+        # Player and team mapping
+        self.player_maps = {
+            str(elements_df["id"].iloc[i]): 
+            {
+                "first_name": elements_df['first_name'].iloc[i],
+                "second_name": elements_df['second_name'].iloc[i],
+                "team": elements_df['team'].iloc[i],
+                "team_code": elements_df['team_code'].iloc[i],
+            }
 
-        # PLAYER ID MAPPING
-        player_map = {}
-        for i in range(len(elements_df)):
-            index = elements_df['id'].iloc[i]
-            first_name = elements_df['first_name'].iloc[i]
-            second_name = elements_df['second_name'].iloc[i]
-            player_map[str(index)] = first_name + " " + second_name
-        self.player_map = player_map
+            for i in range(len(elements_df))
+        }
 
     def download_data(self):
         if not hasattr(self, "player_map" ):
@@ -48,15 +51,21 @@ class FantasyPremierLeagueAPI:
             return False
 
         for player in players:
-            player_name = self.player_map[str(player["id"])]
-            player_stats[player_name] = player["stats"]
+            player_map = self.player_maps[str(player["id"])]
+            full_player_name = player_map.get("first_name") +\
+                " " + player_map.get("second_name")
+            player_stats[full_player_name] = {**player["stats"]}
+            player_stats[full_player_name].update({"id": player["id"]})
+            player_stats[full_player_name].update(player_map, )
         gameweek_stats[str(gameweek_number)] = player_stats
 
         # Saving to disk
-        df = pd.DataFrame(player_stats)
-        directory =f"data/season_{YEAR}"
+        df = pd.DataFrame(player_stats).T
+        directory =f"data/season_{SEASON}"
         os.makedirs(directory, exist_ok=True)
-        df.to_csv(directory+ f"/gameweek_{gameweek_number}.csv")
+        df = df.reset_index()  # This will make the index a column
+        df = df.rename(columns={'index': 'player_name'})  # Rename the new column to 'player_name'
+        df.to_csv(directory+ f"/gameweek_{gameweek_number}.csv", index=False)
         return True
 
 if __name__ == "__main__":

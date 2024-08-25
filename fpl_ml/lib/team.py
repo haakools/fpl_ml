@@ -18,26 +18,28 @@ class Team:
     def __init__(
             self,
             gameweek: int,
-            team_list: List[Player],
+            players: List[Player],
             budget: int,
             transfers_available: int,
             ):
         """Initialise the team with the players and budget for a given gameweek""" 
         self.gameweek = gameweek
-        self.team_list = team_list
+        self.players = players
         self.budget = budget
         self.transfers_available = transfers_available
+
+        self.chip_used = None  #
 
     def draw_starting_team(self):
         positions = {"GK": 1, "DEF": 3, "MID": 3, "FWD": 1}
         self.starting = [
             player for pos, min_count  in positions.items()
             for player in random.sample(
-                [p for p in self.team_list if p.position == pos], 
+                [p for p in self.players if p.position == pos], 
                 min_count
             )
         ]
-        self.benched = [p for p in self.team_list if p not in self.starting]
+        self.benched = [p for p in self.players if p not in self.starting]
 
     def set_captains(self):
         team = self.starting
@@ -49,27 +51,45 @@ class Team:
 
 
     def get_team_info(self) -> dict:
+        
         return {
             "starters": self.starting,
             "bench": self.benched,
             "captain": self.captain,
             "vice captain": self.vice_captain
         }
+    
+    def __repr__(self) -> str:
+        return self.get_team_info()
+
 
 
     def set_team(self):
         self.draw_starting_team()
         self.set_captains()
 
-        # Transfer history
+        # Node information for hashing node
         self.node_information = {
-           
-        } # dict of gameweek: (captain, vice_captain, starting, bench)
-        self.transfers = {} # dict of gameweek: list of tuples of (player.Player, player.Player)
+            "captain": self.captain,
+            "vice_captain": self.vice_captain,
+            "starting": self.starting.sort(key=lambda obj: obj.id),
+            "bench": self.benched.sort(key=lambda obj: obj.id),
+            "chip": self.chip_used,
+            "transfers_in": self.transfers_in,
+            "transfers_out": self.transfers_out
+        }
+
+
+    def transfer(self):
+        available_clubs = self.get_available_clubs_for_transfer()
+
+
+    def get_available_clubs_for_transfer(self):
+        return
 
     def get_club_count(self):
         self.club_count = {}
-        for p in self.team_list:
+        for p in self.players:
             if p.team in self.club_count:
                 self.club_count[p.team] += 1
             else:

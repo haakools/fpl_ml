@@ -23,7 +23,6 @@ class PersonalTeamInfo:
     def chips_used(self) -> str:
         return self.summary.get("chips")
 
-
     def player_ids(self) -> List[str]:
         return [pick.get("element") for pick in self.gameweek_data.get("picks")]
     
@@ -83,7 +82,6 @@ class FplApiHandler:
             print(f"Status code: {e.response.status_code}")
         except requests.exceptions.RequestException as e:
             print(f"An unexpected error occurred: {e}")
-
         except json.JSONDecodeError:
             print("Failed to parse the response as JSON")
 

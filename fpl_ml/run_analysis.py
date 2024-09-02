@@ -24,17 +24,22 @@ def populate_team(team_info: PersonalTeamInfo, season: str, database: GameweekDa
         ) 
 
 def run_analysis(season:str, team_id: int, max_depth: int, iterations: int, output_file: bool, verbose: bool):
-    if not isinstance(team_id, int): team_id = int(team_id)
+    if not isinstance(team_id, int):
+        team_id = int(team_id)
     fpl_api = FplApiHandler()
 
 
     database = GameweekDatabase(season)
     database.load_database()
-    team_info: PersonalTeamInfo = fpl_api.get_personal_team_info(team_id)
+    personal_team_info: PersonalTeamInfo = fpl_api.get_personal_team_info(team_id)
 
 
     # Root Node
-    team: Team = populate_team(team_info, season, database=database)
+    team: Team = populate_team(
+        personal_team_info,
+        season,
+        database=database
+        )
 
     print("Selected team:")
     for player in team.players:

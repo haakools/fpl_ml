@@ -69,6 +69,9 @@ class Team:
 
 
     def set_team(self):
+        # Transfer
+
+
         self.draw_starting_team()
         self.set_captains()
 
@@ -82,6 +85,10 @@ class Team:
             "transfers_in": self.transfers_in,
             "transfers_out": self.transfers_out
         }
+
+    def get_team_hash(self):
+        """To avoid duplicate nodes"""
+        return hash(json.dumps(self.node_information))
 
     def get_available_clubs_for_transfer(self, transfers_out):
 
@@ -109,10 +116,9 @@ class Team:
             weights=15*[1/15],
             k=MAX_TRANSFER_PER_GW
             )
-        
-
+        print(f"[GAMEWEEK {self.gameweek}] TRANSFERING OUT PLAYERS:")
         for p in transfers_out:
-            print(p)        
+            print(f"{p.name}, {p.position}, {p.team}")        
 
         # Get the positions that needs to be filled
         positions = [p.position for p in transfers_out] 

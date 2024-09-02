@@ -27,28 +27,53 @@ MIDFIELD
 
 
 """
+import os
+import json
 
 from fpl_ml.lib.player import Player
 
-class ExpectedPointsModel:
-    def __init__(self) -> None:
-        pass
 
+
+class ExpectedPointsModel:
+    def __init__(self, player_fixtures,  save_folder: str = "expectedpoints") -> None:
+        self.save_folder = save_folder
+        self.player_fixtures = player_fixtures
 
     def get_points(self, player: Player):
         player_position = player.position
-        match player_position:
-            case "GK":
-                return
+        print(player_position)
+        if player_position == "GK":
+            return
+        elif player_position == "DEF":
+            return
+        elif player_position == "MID":
+            return
+        elif player_position == "FWD":
+            return
+        else:
+            raise ValueError(f"ERROR: COULD NOT FIND POSITION FOR PLAYER {player}")
+        
 
-            case "DEF":
-                return
-            
-            case "MID":
-                return
 
-            case "FWD":
-                return
-            case _:
-                raise ValueError(f"ERROR: COULD NOT FIND POSITION FOR PLAYER {player}")
+        #match player_position:
+        #    case "GK":
+        #        return
+
+        #    case "DEF":
+        #        return
+        #    
+        #    case "MID":
+        #        return
+
+        #    case "FWD":
+        #        return
+        #    case _:
+        #        raise ValueError(f"ERROR: COULD NOT FIND POSITION FOR PLAYER {player}")
             
+
+
+
+
+
+
+

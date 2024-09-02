@@ -17,34 +17,47 @@ Complete one random (or biased by ML model) playout from node C.
 BACKPROPAGATION
 The points will be added back to the root divided by around 2400 (typical fantasy score?)
 """
+from typing import List
 import math
+from itertools import count
 import random
 
 from fpl_ml.lib.team import Team
 from fpl_ml.gameweek_database import GameweekDatabase
 
 
-def hash_objects(object_list: list):
-    # TODO: test that this would ensure the same hash for different orders
-    return hash(tuple(object_list))
-
-# Scaler values
-MAX_POINTS_FOR_SEASON = 3000
+# Scalar values --> needed for numerical stablity if future use???
+MAX_POINTS_FOR_SEASON = 3000 # guessed maximum points in a season. seems large enough
 MAX_POINTS_FOR_A_ROUND = MAX_POINTS_FOR_SEASON/38 #~78
 
 class MCTSNode:
-    def __init__(self, state, parent=None):
-        self.state = state
+    def __init__(self, state: Team, parent=None):
+        self.state: Team = state
         self.parent = parent
         self.children = []
         self.visits = 0
         self.value = 0
+
+        self.tried_action_hashes = parent.tried_action_hashes
         self.untried_actions = self.get_untried_actions()
 
-    def get_untried_actions(self):
-        # Return a list of untried actions from the current state
-        pass
+        self.hash = None #self.generate_team()
 
+    def generate_team(self, retry=count(), max_retry:int = 5) -> str:
+        """Make a gameweek change. Returns hash of team to pass to parent node"""
+        # TODO: Need to compare with hash of other parts. 
+        # Randomness and weighting will help for now
+        if retry == max_retry: 
+            print("Generated the same hash 5 times in a row")
+            return 
+
+        self.state.set_team()
+        team_hash = self.state.get_team_hash()
+        if team_hash in self.tried_action_hashes:
+            counter = next(retry)
+            return self.get_untried_actions(retry=counter)
+        return team_hash
+   
     def select_child(self):
         """UCB1 Formula"""
         return max(self.children, key=lambda c: c.value / c.visits + 
@@ -55,6 +68,7 @@ class MCTSNode:
         next_state = self.state.apply_action(action)
         child = MCTSNode(next_state, parent=self)
         self.children.append(child)
+
         return child
 
     def update(self, reward):
@@ -67,7 +81,7 @@ class MCTS:
                  database: GameweekDatabase,
                  max_depth = 10, 
                  iterations=1000, exploration_weight=1.4):
-        self.root: MCTSNode = MCTSNode(root_team)
+        self.root: MCTSNode = MCTSNode(root_team, [])
         self.database: GameweekDatabase = database
         self.iterations = iterations
         self.exploration_weight = exploration_weight
@@ -81,7 +95,7 @@ class MCTS:
 
         return self.best_action(self.root)
 
-    def select_node(self, node):
+    def select_node(self, node: MCTSNode):
         while node.untried_actions == [] and node.children != []:
             node = node.select_child()
         if node.untried_actions != []:

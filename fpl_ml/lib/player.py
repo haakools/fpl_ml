@@ -14,6 +14,9 @@ class Player:
         self.id = id
         self.gameweek = gameweek
         self.series = series
+        print(self.gameweek, "-1")
+        print(self.series)
+        print(len(self.series))
         self.team: str = self.series["team"].iloc[self.gameweek-1]
         self.team_code: str = self.series["team_code"].iloc[self.gameweek-1]
         self.name: str = self.series["name"].iloc[self.gameweek-1]

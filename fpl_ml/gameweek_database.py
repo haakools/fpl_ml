@@ -191,10 +191,7 @@ class GameweekDatabase:
 
 
 
-        # TODO: 
-        #  - Make this horrible ChatGPT code more readable 
-        # - convert "was_home" to "is_home" and make it parse the opposition attack/defence home/away correctly
-        #
+        # TODO: Make this horrible ChatGPT code more readable 
         def add_team_prefix_to_team_info(team_info, prefix: str):
             team_data = []
             for team_id, team_stats in team_info.items():
@@ -210,14 +207,19 @@ class GameweekDatabase:
         opponent_team_info_df = add_team_prefix_to_team_info(self.team_ratings[self.season], "opponent_")
         player_team_info_df = add_team_prefix_to_team_info(self.team_ratings[self.season], "player_team_")
 
-        # Ensure consistent column names and strip any leading/trailing spaces
-        df.columns = df.columns.str.strip()
-        opponent_team_info_df.columns = opponent_team_info_df.columns.str.strip()
-        player_team_info_df.columns = player_team_info_df.columns.str.strip()
+        # Merge the dataframes
+        df = df.merge(opponent_team_info_df, how='left', on='opponent_team')
+        df = df.merge(player_team_info_df, how='left', on='team_code')
 
-        df = df.merge(opponent_team_info_df, how='left', left_on='opponent_team', right_on='opponent_team')
-        df = df.merge(player_team_info_df, how='left', left_on='team_code', right_on='team_code')
+        # Apply the home/away logic
+        df['opponent_strength_attack'] = df.apply(lambda row: row['opponent_strength_attack_home'] if not row['was_home'] else row['opponent_strength_attack_away'], axis=1)
+        df['opponent_strength_defence'] = df.apply(lambda row: row['opponent_strength_defence_home'] if not row['was_home'] else row['opponent_strength_defence_away'], axis=1)
+        df['player_team_strength_attack'] = df.apply(lambda row: row['player_team_strength_attack_home'] if row['was_home'] else row['player_team_strength_attack_away'], axis=1)
+        df['player_team_strength_defence'] = df.apply(lambda row: row['player_team_strength_defence_home'] if row['was_home'] else row['player_team_strength_defence_away'], axis=1)
 
+        # Drop the unnecessary columns
+        columns_to_drop = [ c for c in df.columns if c.endswith("_away") or c.endswith("_home")]
+        df = df.drop(columns=columns_to_drop)
 
         self.season_data[self.season] = df
         print(f"GameweekDatabase:: team fixtures loaded")

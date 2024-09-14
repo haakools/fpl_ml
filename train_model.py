@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import json 
+import sys
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
@@ -35,29 +36,11 @@ def train_model(season:str):
     for c in striker_1.columns:
         print(c)
 
-    # TODO use was_home column to reduce features to 
-    # opponent_strength_attack, 
-    # opponent_strength_defence
-    # player_team_strength_attack
-    # player_team_strength_defence
-
     feature_columns = [
-        "opponent_team",
-        "was_home",
-        "opponent_strength",
-        "opponent_strength_overall_home",
-        "opponent_strength_overall_away",
-        "opponent_strength_attack_home",
-        "opponent_strength_attack_away",
-        "opponent_strength_defence_home",
-        "opponent_strength_defence_away",
-        "player_team_strength",
-        "player_team_strength_overall_home",
-        "player_team_strength_overall_away",
-        "player_team_strength_attack_home",
-        "player_team_strength_attack_away",
-        "player_team_strength_defence_home",
-        "player_team_strength_defence_away"
+        "opponent_strength_attack",
+        "opponent_strength_defence",
+        "player_team_strength_attack",
+        "player_team_strength_defence",
     ]
 
     # Some target columns to model against

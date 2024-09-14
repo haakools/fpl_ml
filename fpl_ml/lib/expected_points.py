@@ -26,12 +26,13 @@ MIDFIELD
 3. Expected goals*goalpoints + Expected assists*assistpoints
 
 
+
+
 """
 import os
 import json
 
 from fpl_ml.lib.player import Player
-
 
 
 class ExpectedPointsModel:
@@ -43,12 +44,20 @@ class ExpectedPointsModel:
         player_position = player.position
         print(player_position)
         if player_position == "GK":
+            # 1. Expected goals conceded 
+            # 2. Team Defense Quality / Opposition Offense Quality
             return
         elif player_position == "DEF":
+
+            # 1. Expected goals conceded as low as possible.
+            # 2. Team Defense Quality / Opposition Offense Quality
+            # 3. Expected goals*goalpoints + Expected assists*assistpoints
             return
         elif player_position == "MID":
+
             return
         elif player_position == "FWD":
+
             return
         else:
             raise ValueError(f"ERROR: COULD NOT FIND POSITION FOR PLAYER {player}")

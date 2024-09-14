@@ -114,7 +114,7 @@ class Team:
         transfers_out: List[Player] = random.choices(
             self.players, 
             weights=15*[1/15],
-            k=MAX_TRANSFER_PER_GW
+            k=MAX_TRANSFER_PkR_GW
             )
         print(f"[GAMEWEEK {self.gameweek}] TRANSFERING OUT PLAYERS:")
         for p in transfers_out:
@@ -138,7 +138,7 @@ class Team:
             weights=all_players_expected_score,
             k=MAX_TRANSFER_PER_GW
         )
-        return transfers_in
+        return 
 
 
 if __name__ == "__main__":

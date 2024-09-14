@@ -28,10 +28,12 @@ def run_analysis(season:str, team_id: int, max_depth: int, iterations: int, outp
         team_id = int(team_id)
     fpl_api = FplApiHandler()
 
-
     database = GameweekDatabase(season)
     database.load_database()
+
     personal_team_info: PersonalTeamInfo = fpl_api.get_personal_team_info(team_id)
+
+    print(f"Personal team info {personal_team_info}")
 
 
     # Root Node
@@ -44,7 +46,8 @@ def run_analysis(season:str, team_id: int, max_depth: int, iterations: int, outp
     print("Selected team:")
     for player in team.players:
         print(player)
-
+    import sys
+    sys.exit(0)
 
     mcts = MCTS(team, database, max_depth=max_depth, iterations=iterations)
     result = mcts.search()

@@ -263,6 +263,8 @@ class GameweekDatabase:
 
     def get_player_by_position(self, position: str):
         df = self.season_data[self.season]
+        if isinstance(position, list):
+            return pd.concat([df[df["position"] == p] for p in position], ignore_index=True)
         return df[df["position"] == position]
 
     # Expected points model below

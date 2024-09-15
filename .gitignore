@@ -9,4 +9,5 @@ __pycache__
 # Downloaded data 
 data
 
-
+# plots for expected_goals models
+plots/
